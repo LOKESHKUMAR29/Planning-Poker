@@ -1,0 +1,93 @@
+import React from 'react';
+import { Users, Check } from 'lucide-react';
+import type { Participant } from '../context/GameContext';
+import { motion } from 'framer-motion';
+
+interface ParticipantListProps {
+  participants: Participant[];
+  currentUserId?: string;
+}
+
+const ParticipantList: React.FC<ParticipantListProps> = ({ participants, currentUserId }) => {
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map(n => n[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
+  const getAvatarColor = (id: string) => {
+    const colors = [
+      'bg-gradient-to-br from-pink-500 to-rose-500',
+      'bg-gradient-to-br from-purple-500 to-indigo-500',
+      'bg-gradient-to-br from-blue-500 to-cyan-500',
+      'bg-gradient-to-br from-green-500 to-emerald-500',
+      'bg-gradient-to-br from-yellow-500 to-orange-500',
+      'bg-gradient-to-br from-red-500 to-pink-500',
+    ];
+    const index = id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    return colors[index % colors.length];
+  };
+
+  return (
+    <div className="glass-effect rounded-2xl p-6 h-full">
+      <div className="flex items-center gap-3 mb-6">
+        <Users className="w-6 h-6 text-primary-400" />
+        <h2 className="text-xl font-bold">Participants ({participants.length})</h2>
+      </div>
+
+      <div className="space-y-3">
+        {participants.map((participant, index) => (
+          <motion.div
+            key={participant.id}
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: index * 0.1 }}
+            className={`flex items-center gap-3 p-3 rounded-lg transition-all
+              ${participant.id === currentUserId ? 'bg-primary-500/20 ring-2 ring-primary-500' : 'bg-white/5 hover:bg-white/10'}`}
+          >
+            {/* Avatar */}
+            <div className={`w-10 h-10 rounded-full ${getAvatarColor(participant.id)} flex items-center justify-center text-white font-bold text-sm shadow-lg`}>
+              {getInitials(participant.name)}
+            </div>
+
+            {/* Name and Status */}
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2">
+                <p className="font-semibold truncate">{participant.name}</p>
+                {participant.isModerator && (
+                  <span className="px-2 py-0.5 bg-yellow-500 text-yellow-900 text-xs font-bold rounded">
+                    MOD
+                  </span>
+                )}
+              </div>
+              {participant.id === currentUserId && (
+                <p className="text-xs text-primary-300">You</p>
+              )}
+            </div>
+
+            {/* Vote Status */}
+            {participant.hasVoted && (
+              <div className="flex-shrink-0">
+                <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                  <Check className="w-4 h-4 text-white" />
+                </div>
+              </div>
+            )}
+          </motion.div>
+        ))}
+      </div>
+
+      {participants.length === 0 && (
+        <div className="text-center text-gray-400 py-8">
+          <Users className="w-12 h-12 mx-auto mb-3 opacity-50" />
+          <p>No participants yet</p>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default ParticipantList;

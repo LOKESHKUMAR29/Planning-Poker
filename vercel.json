@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/socket",
+      "destination": "https://your-socket-server.vercel.app"
+    }
+  ]
+}
