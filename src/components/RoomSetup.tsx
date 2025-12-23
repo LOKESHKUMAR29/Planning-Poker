@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Sparkles, LogIn, Copy, Check } from 'lucide-react';
+import { Sparkles, LogIn} from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface RoomSetupProps {

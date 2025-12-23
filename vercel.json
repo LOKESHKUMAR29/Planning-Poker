@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/socket",
-      "destination": "https://your-socket-server.vercel.app"
+      "destination": "https://planning-poker-036o.onrender.com"
     }
   ]
 }
