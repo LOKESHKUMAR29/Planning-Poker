@@ -44,7 +44,9 @@ const Table: React.FC<TableProps> = ({
                 initial={{ opacity: 0, scale: 0 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: index * 0.05 }}
-                className="flex flex-col items-center gap-1"
+                className={`flex flex-col items-center gap-1 p-2 rounded-2xl transition-all ${
+                  isCurrentUser ? 'bg-primary-500/10 ring-1 ring-primary-500/50 shadow-[0_0_20px_rgba(59,130,246,0.2)]' : ''
+                }`}
               >
                 {/* Participant Name */}
                 <div className={`px-2 py-0.5 rounded-full text-[10px] font-bold whitespace-nowrap

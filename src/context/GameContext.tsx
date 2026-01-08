@@ -76,6 +76,8 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         currentUser: data.user,
         participants: data.participants,
       }));
+      // Update URL to include room ID
+      window.history.pushState({}, '', `/${data.roomId}`);
     });
 
     // Participants updated
@@ -163,6 +165,8 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         revealed: false,
         currentUser: null,
       });
+      // Reset URL
+      window.history.pushState({}, '', '/');
     }
   };
 

@@ -19,8 +19,9 @@ const GameView: React.FC = () => {
 
   const [copied, setCopied] = useState(false);
 
-  const handleCopyRoomId = () => {
-    navigator.clipboard.writeText(gameState.roomId);
+  const handleCopyLink = () => {
+    const fullUrl = `${window.location.origin}/${gameState.roomId}`;
+    navigator.clipboard.writeText(fullUrl);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -46,17 +47,28 @@ const GameView: React.FC = () => {
             </div>
 
             <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-gray-400">Room ID:</span>
-                <code className="px-3 py-1 bg-white/10 rounded font-mono text-primary-300">
-                  {gameState.roomId}
-                </code>
+              <div className="flex items-center bg-primary-500/5 rounded-xl border border-primary-500/20 overflow-hidden shadow-inner group">
+                <div className="px-3 py-1 flex flex-col items-start leading-none border-r border-primary-500/20 bg-primary-500/10 transition-colors group-hover:bg-primary-500/20">
+                  <span className="text-[7px] text-primary-300 font-black uppercase tracking-widest mb-0.5">Room ID</span>
+                   <code className="text-[11px] font-mono font-bold text-white ring-offset-2 ring-primary-400/30">
+                    {gameState.roomId}
+                  </code>
+                </div>
                 <button
-                  onClick={handleCopyRoomId}
-                  className="p-2 hover:bg-white/10 rounded-lg transition-colors"
-                  title="Copy Room ID"
+                  onClick={handleCopyLink}
+                  className="px-3 py-2 bg-primary-500 hover:bg-primary-600 transition-all flex items-center gap-2 relative group"
                 >
-                  {copied ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4" />}
+                  {copied ? <Check className="w-3.5 h-3.5 text-white" /> : <Copy className="w-3.5 h-3.5 text-white" />}
+                  <span className="text-[10px] font-black text-white uppercase tracking-tighter">Copy link</span>
+                  {copied && (
+                    <motion.span 
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="absolute -top-10 left-1/2 -translate-x-1/2 px-3 py-1 bg-white text-primary-600 font-bold text-[10px] rounded-lg shadow-[0_4px_15px_rgba(0,0,0,0.3)] pointer-events-none whitespace-nowrap z-50 border border-primary-100"
+                    >
+                      Copied!
+                    </motion.span>
+                  )}
                 </button>
               </div>
 
@@ -166,9 +178,17 @@ const App: React.FC = () => {
 
 const AppContent: React.FC = () => {
   const { gameState, createRoom, joinRoom } = useGame();
+  const [initialRoomId, setInitialRoomId] = React.useState('');
+
+  React.useEffect(() => {
+    const path = window.location.pathname.slice(1);
+    if (path && path.length >= 4) { // Basic validation for room ID
+      setInitialRoomId(path);
+    }
+  }, []);
 
   if (!gameState.roomId) {
-    return <RoomSetup onCreateRoom={createRoom} onJoinRoom={joinRoom} />;
+    return <RoomSetup onCreateRoom={createRoom} onJoinRoom={joinRoom} initialRoomId={initialRoomId} />;
   }
 
   return <GameView />;

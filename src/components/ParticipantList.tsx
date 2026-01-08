@@ -45,9 +45,14 @@ const ParticipantList: React.FC<ParticipantListProps> = ({ participants, current
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: index * 0.1 }}
-            className={`flex items-center gap-2 p-2 rounded-lg transition-all
-              ${participant.id === currentUserId ? 'bg-primary-500/20 ring-1 ring-primary-500' : 'bg-white/5 hover:bg-white/10'}`}
+            className={`flex items-center gap-2 p-2 rounded-lg transition-all relative overflow-hidden
+              ${participant.id === currentUserId 
+                ? 'bg-primary-500/20 ring-1 ring-primary-500 shadow-[0_0_15px_rgba(59,130,246,0.3)]' 
+                : 'bg-white/5 hover:bg-white/10'}`}
           >
+            {participant.id === currentUserId && (
+              <div className="absolute inset-0 bg-gradient-to-r from-primary-500/10 to-transparent pointer-events-none" />
+            )}
             {/* Avatar */}
             <div className={`w-8 h-8 rounded-full ${getAvatarColor(participant.id)} flex items-center justify-center text-white font-bold text-xs shadow-lg`}>
               {getInitials(participant.name)}

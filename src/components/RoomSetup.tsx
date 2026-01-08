@@ -5,12 +5,20 @@ import { motion } from 'framer-motion';
 interface RoomSetupProps {
   onCreateRoom: (userName: string) => void;
   onJoinRoom: (roomId: string, userName: string) => void;
+  initialRoomId?: string;
 }
 
-const RoomSetup: React.FC<RoomSetupProps> = ({ onCreateRoom, onJoinRoom }) => {
-  const [mode, setMode] = useState<'select' | 'create' | 'join'>('select');
+const RoomSetup: React.FC<RoomSetupProps> = ({ onCreateRoom, onJoinRoom, initialRoomId }) => {
+  const [mode, setMode] = useState<'select' | 'create' | 'join'>(initialRoomId ? 'join' : 'select');
   const [userName, setUserName] = useState('');
-  const [roomId, setRoomId] = useState('');
+  const [roomId, setRoomId] = useState(initialRoomId || '');
+
+  React.useEffect(() => {
+    if (initialRoomId) {
+      setMode('join');
+      setRoomId(initialRoomId);
+    }
+  }, [initialRoomId]);
 
   const handleCreateRoom = (e: React.FormEvent) => {
     e.preventDefault();
