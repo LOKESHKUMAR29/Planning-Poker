@@ -4,7 +4,7 @@ import { io } from 'socket.io-client';
 import type { Socket } from 'socket.io-client';
 
 // Card values for Planning Poker
-export const CARD_VALUES = ['1', '2', '3', '5', '?', '☕'];
+export const CARD_VALUES = ['1', '2', '3', '5'];
 
 export interface Participant {
   id: string;
@@ -192,3 +192,4 @@ export const useGame = () => {
   }
   return context;
 };
+

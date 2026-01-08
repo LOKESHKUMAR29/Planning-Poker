@@ -19,34 +19,23 @@ const Table: React.FC<TableProps> = ({
   onVote,
   selectedVote,
 }) => {
-  const getParticipantPosition = (index: number, total: number) => {
-    const angle = (index / total) * 2 * Math.PI - Math.PI / 2;
-    // Elliptical radius to better fit the rectangular (aspect-video) table
-    const radiusX = 180;
-    const radiusY = 110;
-    const x = Math.cos(angle) * radiusX;
-    const y = Math.sin(angle) * radiusY;
-    return { x, y };
-  };
-
   return (
-    <div className="flex flex-col items-center gap-8">
+    <div className="flex flex-col items-center gap-2">
       {/* Poker Table */}
-      <div className="relative w-full max-w-4xl aspect-video poker-table rounded-3xl p-8 flex items-center justify-center overflow-hidden">
-        <div className="relative w-full h-full flex items-center justify-center">
-          {/* Center Logo */}
+      <div className="relative w-full max-w-2xl min-h-[160px] poker-table rounded-3xl p-4 flex flex-col items-center justify-center overflow-hidden">
+        {/* Center Logo/Text - Branded behind cards */}
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
           <motion.div
-            initial={{ scale: 0, rotate: -180 }}
-            animate={{ scale: 1, rotate: 0 }}
-            transition={{ duration: 0.8, type: 'spring' }}
-            className="absolute text-white/20 text-6xl font-bold"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-white/5 text-6xl font-black italic tracking-tighter"
           >
             POKER
           </motion.div>
+        </div>
 
-          {/* Participants' Cards in Circle */}
+        <div className="relative w-full flex flex-wrap justify-center items-center gap-4 z-10">
           {participants.map((participant, index) => {
-            const pos = getParticipantPosition(index, participants.length);
             const isCurrentUser = participant.id === currentUserId;
 
             return (
@@ -54,16 +43,11 @@ const Table: React.FC<TableProps> = ({
                 key={participant.id}
                 initial={{ opacity: 0, scale: 0 }}
                 animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: index * 0.1 }}
-                className="absolute flex flex-col items-center gap-2"
-                style={{
-                  left: `calc(50% + ${pos.x}px)`,
-                  top: `calc(50% + ${pos.y}px)`,
-                  transform: 'translate(-50%, -50%)',
-                }}
+                transition={{ delay: index * 0.05 }}
+                className="flex flex-col items-center gap-1"
               >
                 {/* Participant Name */}
-                <div className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap
+                <div className={`px-2 py-0.5 rounded-full text-[10px] font-bold whitespace-nowrap
                   ${isCurrentUser ? 'bg-primary-500 text-white' : 'bg-white/10 text-white'}`}>
                   {participant.name}
                   {participant.isModerator && ' 👑'}
@@ -77,7 +61,7 @@ const Table: React.FC<TableProps> = ({
                     size="small"
                   />
                 ) : (
-                  <div className="w-16 h-24 rounded-xl border-2 border-dashed border-white/30 flex items-center justify-center text-white/30 text-xs">
+                  <div className="w-16 h-24 rounded-xl border-2 border-dashed border-white/20 flex items-center justify-center text-white/20 text-[10px] bg-white/5">
                     Waiting...
                   </div>
                 )}
@@ -88,9 +72,9 @@ const Table: React.FC<TableProps> = ({
       </div>
 
       {/* Card Selection */}
-      <div className="w-full max-w-4xl">
-        <h3 className="text-center text-lg font-semibold mb-4">Select Your Card</h3>
-        <div className="flex flex-wrap justify-center gap-4">
+      <div className="w-full max-w-2xl">
+        <h3 className="text-center text-xs font-bold text-gray-400 mb-1 uppercase tracking-widest">Select Card</h3>
+        <div className="flex flex-wrap justify-center gap-2">
           {CARD_VALUES.map((value, index) => (
             <motion.div
               key={value}

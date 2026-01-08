@@ -32,33 +32,33 @@ const ParticipantList: React.FC<ParticipantListProps> = ({ participants, current
   };
 
   return (
-    <div className="glass-effect rounded-2xl p-6 h-full">
-      <div className="flex items-center gap-3 mb-6">
-        <Users className="w-6 h-6 text-primary-400" />
-        <h2 className="text-xl font-bold">Participants ({participants.length})</h2>
+    <div className="glass-effect rounded-xl p-3">
+      <div className="flex items-center gap-2 mb-3">
+        <Users className="w-5 h-5 text-primary-400" />
+        <h2 className="text-lg font-bold">Participants ({participants.length})</h2>
       </div>
 
-      <div className="space-y-3">
+      <div className="space-y-1.5 max-h-[200px] overflow-y-auto pr-1 custom-scrollbar">
         {participants.map((participant, index) => (
           <motion.div
             key={participant.id}
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: index * 0.1 }}
-            className={`flex items-center gap-3 p-3 rounded-lg transition-all
-              ${participant.id === currentUserId ? 'bg-primary-500/20 ring-2 ring-primary-500' : 'bg-white/5 hover:bg-white/10'}`}
+            className={`flex items-center gap-2 p-2 rounded-lg transition-all
+              ${participant.id === currentUserId ? 'bg-primary-500/20 ring-1 ring-primary-500' : 'bg-white/5 hover:bg-white/10'}`}
           >
             {/* Avatar */}
-            <div className={`w-10 h-10 rounded-full ${getAvatarColor(participant.id)} flex items-center justify-center text-white font-bold text-sm shadow-lg`}>
+            <div className={`w-8 h-8 rounded-full ${getAvatarColor(participant.id)} flex items-center justify-center text-white font-bold text-xs shadow-lg`}>
               {getInitials(participant.name)}
             </div>
 
             {/* Name and Status */}
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2">
-                <p className="font-semibold truncate">{participant.name}</p>
+                <p className="font-semibold truncate text-sm">{participant.name}</p>
                 {participant.isModerator && (
-                  <span className="px-2 py-0.5 bg-yellow-500 text-yellow-900 text-xs font-bold rounded">
+                  <span className="px-1.5 py-0.5 bg-yellow-500 text-yellow-900 text-[10px] font-bold rounded">
                     MOD
                   </span>
                 )}

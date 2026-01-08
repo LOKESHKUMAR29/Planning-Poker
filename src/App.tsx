@@ -30,18 +30,18 @@ const GameView: React.FC = () => {
   const hasVotes = gameState.participants.some(p => p.hasVoted);
 
   return (
-    <div className="min-h-screen p-4 md:p-8">
+    <div className="h-screen flex flex-col p-2 md:p-4 overflow-hidden">
       {/* Header */}
-      <div className="max-w-7xl mx-auto mb-8">
-        <div className="glass-effect rounded-2xl p-4 md:p-6">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+      <div className="max-w-7xl w-full mx-auto mb-2">
+        <div className="glass-effect rounded-xl p-2 md:px-4 md:py-2">
+          <div className="flex flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-4">
               <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-primary-400 to-accent-400 bg-clip-text text-transparent">
                 Planning Poker
               </h1>
-              <div className={`flex items-center gap-2 px-3 py-1 rounded-full ${connected ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
-                {connected ? <Wifi className="w-4 h-4" /> : <WifiOff className="w-4 h-4" />}
-                <span className="text-sm font-semibold">{connected ? 'Connected' : 'Disconnected'}</span>
+              <div className={`flex items-center gap-1.5 px-2 py-0.5 rounded-full ${connected ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
+                {connected ? <Wifi className="w-3 h-3" /> : <WifiOff className="w-3 h-3" />}
+                <span className="text-xs font-semibold">{connected ? 'Connected' : 'Disconnected'}</span>
               </div>
             </div>
 
@@ -62,10 +62,10 @@ const GameView: React.FC = () => {
 
               <button
                 onClick={leaveRoom}
-                className="flex items-center gap-2 px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-lg transition-colors"
+                className="flex items-center gap-2 px-3 py-1.5 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-lg transition-colors text-sm"
               >
-                <LogOut className="w-4 h-4" />
-                <span className="hidden md:inline">Leave</span>
+                <LogOut className="w-3.5 h-3.5" />
+                <span>Leave</span>
               </button>
             </div>
           </div>
@@ -73,9 +73,9 @@ const GameView: React.FC = () => {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-4 gap-6">
+      <div className="max-w-7xl w-full mx-auto flex-1 grid grid-cols-1 lg:grid-cols-4 gap-4 overflow-hidden">
         {/* Participants Sidebar */}
-        <div className="lg:col-span-1 order-2 lg:order-1">
+        <div className="lg:col-span-1 order-2 lg:order-1 h-fit">
           <ParticipantList
             participants={gameState.participants}
             currentUserId={currentUser?.id}
@@ -83,7 +83,7 @@ const GameView: React.FC = () => {
         </div>
 
         {/* Game Area */}
-        <div className="lg:col-span-3 order-1 lg:order-2 space-y-6">
+        <div className="lg:col-span-3 order-1 lg:order-2 flex flex-col gap-2 overflow-y-auto pr-2 custom-scrollbar">
           <Table
             participants={gameState.participants}
             currentUserId={currentUser?.id}
@@ -106,14 +106,13 @@ const GameView: React.FC = () => {
           <AnimatePresence>
             {gameState.revealed && hasVotes && (
               <motion.div
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                className="glass-effect rounded-2xl p-6"
+                exit={{ opacity: 0, y: -10 }}
+                className="glass-effect rounded-xl p-2.5"
               >
-                <h3 className="text-xl font-bold mb-4">Voting Results</h3>
-                <div className="flex flex-col md:flex-row gap-6 items-start">
-                  <div className="flex-1 grid grid-cols-2 md:grid-cols-4 gap-4 w-full">
+                <div className="flex flex-row items-center justify-between gap-4">
+                  <div className="flex flex-row flex-1 gap-2 overflow-x-auto pb-0.5 custom-scrollbar">
                     {(() => {
                       const voteCounts = gameState.participants
                         .filter(p => p.vote)
@@ -123,29 +122,28 @@ const GameView: React.FC = () => {
                         }, {} as Record<string, number>);
 
                       return Object.entries(voteCounts).map(([vote, count]) => (
-                        <div key={vote} className="bg-white/10 rounded-lg p-4 text-center">
-                          <div className="text-3xl font-bold text-primary-400">{vote}</div>
-                          <div className="text-sm text-gray-400">{count} vote{count !== 1 ? 's' : ''}</div>
+                        <div key={vote} className="bg-white rounded-lg px-3 py-1.5 flex flex-col items-center justify-center min-w-[45px] shadow-lg border border-white/20">
+                          <div className="text-xl font-bold text-slate-800 leading-tight">{vote}</div>
+                          <div className="text-[9px] font-bold text-primary-600 uppercase tracking-tighter">{count} {count !== 1 ? 'votes' : 'vote'}</div>
                         </div>
                       ));
                     })()}
                   </div>
 
-                  <div className="w-full md:w-auto min-w-[200px] bg-primary-500/20 rounded-lg p-6 flex flex-col items-center justify-center border border-primary-500/30">
-                    <div className="text-sm text-primary-300 font-semibold mb-1 uppercase tracking-wider">Average</div>
-                    <div className="text-5xl font-bold text-white">
-                      {(() => {
-                        const numericVotes = gameState.participants
-                          .filter(p => p.vote && !isNaN(Number(p.vote)))
-                          .map(p => Number(p.vote));
-                        
-                        if (numericVotes.length === 0) return '-';
-                        const sum = numericVotes.reduce((a, b) => a + b, 0);
-                        return (sum / numericVotes.length).toFixed(1);
-                      })()}
-                    </div>
-                    <div className="text-xs text-primary-400 mt-2">
-                      Based on {gameState.participants.filter(p => p.vote && !isNaN(Number(p.vote))).length} numeric votes
+                  <div className="bg-gradient-to-br from-primary-500/20 to-accent-500/20 rounded-lg px-4 py-1.5 flex flex-row items-center gap-2 border border-primary-500/30">
+                    <div className="flex flex-col items-center leading-none">
+                      <span className="text-[9px] text-primary-300 font-bold uppercase tracking-widest">Avg</span>
+                      <div className="text-2xl font-black text-white">
+                        {(() => {
+                          const numericVotes = gameState.participants
+                            .filter(p => p.vote && !isNaN(Number(p.vote)))
+                            .map(p => Number(p.vote));
+                          
+                          if (numericVotes.length === 0) return '-';
+                          const sum = numericVotes.reduce((a, b) => a + b, 0);
+                          return (sum / numericVotes.length).toFixed(1);
+                        })()}
+                      </div>
                     </div>
                   </div>
                 </div>

@@ -19,25 +19,25 @@ const ModeratorControls: React.FC<ModeratorControlsProps> = ({
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="flex gap-4 justify-center"
+      className="flex gap-2 justify-center"
     >
       <button
         onClick={onReveal}
         disabled={revealed || !hasVotes}
-        className={`btn-primary flex items-center gap-2 ${
+        className={`bg-primary-500 hover:bg-primary-600 px-4 py-1.5 rounded-lg text-white text-sm font-bold flex items-center gap-2 transition-all ${
           revealed || !hasVotes ? 'opacity-50 cursor-not-allowed' : ''
         }`}
       >
-        <Eye className="w-5 h-5" />
-        Reveal Votes
+        <Eye className="w-4 h-4" />
+        Reveal
       </button>
 
       <button
         onClick={onReset}
-        className="btn-secondary flex items-center gap-2"
+        className="bg-accent-500 hover:bg-accent-600 px-4 py-1.5 rounded-lg text-white text-sm font-bold flex items-center gap-2 transition-all"
       >
-        <RotateCcw className="w-5 h-5" />
-        Reset Table
+        <RotateCcw className="w-4 h-4" />
+        Reset
       </button>
     </motion.div>
   );
