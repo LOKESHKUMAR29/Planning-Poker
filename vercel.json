@@ -3,6 +3,10 @@
     {
       "source": "/api/socket",
       "destination": "https://planning-poker-036o.onrender.com"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ]
 }
