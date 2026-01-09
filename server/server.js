@@ -6,6 +6,11 @@ const cors = require('cors');
 const app = express();
 app.use(cors());
 
+// Health check endpoint for Render/uptime monitoring
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {
@@ -21,6 +26,41 @@ const rooms = new Map();
 function generateRoomId() {
   return Math.random().toString(36).substring(2, 8).toUpperCase();
 }
+
+// Keep-alive mechanism for Render free tier
+// Pings the health endpoint every 13 minutes to prevent service sleep
+const SELF_PING_INTERVAL = 13 * 60 * 1000; // 13 minutes
+const SERVER_URL = process.env.SERVER_URL || 'https://planning-poker-036o.onrender.com';
+
+function startSelfPing() {
+  setInterval(() => {
+    const https = require('https');
+    console.log(`[${new Date().toISOString()}] Sending self-ping to ${SERVER_URL}/health`);
+    https.get(`${SERVER_URL}/health`, (res) => {
+      console.log(`[${new Date().toISOString()}] Self-ping response: ${res.statusCode}`);
+    }).on('error', (err) => {
+      console.error(`[${new Date().toISOString()}] Self-ping error:`, err.message);
+    });
+  }, SELF_PING_INTERVAL);
+}
+
+if (process.env.NODE_ENV === 'production') {
+  startSelfPing();
+}
+
+// Clean up stale empty rooms every 10 minutes
+// Rooms are deleted if empty for more than 60 minutes
+setInterval(() => {
+  const now = Date.now();
+  const GRACE_PERIOD = 60 * 60 * 1000; // 60 minutes
+
+  for (const [roomId, room] of rooms.entries()) {
+    if (room.participants.length === 0 && room.emptySince && (now - room.emptySince > GRACE_PERIOD)) {
+      rooms.delete(roomId);
+      console.log(`[${new Date().toISOString()}] Stale room deleted: ${roomId}`);
+    }
+  }
+}, 10 * 60 * 1000);
 
 io.on('connection', (socket) => {
   console.log('User connected:', socket.id);
@@ -40,6 +80,7 @@ io.on('connection', (socket) => {
       id: roomId,
       participants: [user],
       revealed: false,
+      emptySince: null
     });
 
     socket.join(roomId);
@@ -52,7 +93,7 @@ io.on('connection', (socket) => {
       participants: [user],
     });
 
-    console.log(`Room created: ${roomId} by ${userName}`);
+    console.log(`[${new Date().toISOString()}] Room created: ${roomId} by ${userName}`);
   });
 
   // Join an existing room
@@ -60,9 +101,12 @@ io.on('connection', (socket) => {
     const room = rooms.get(roomId);
 
     if (!room) {
-      socket.emit('error', { message: 'Room not found' });
+      socket.emit('error', { message: 'Room not found or expired' });
       return;
     }
+
+    // Reset empty timer if someone joins
+    room.emptySince = null;
 
     const user = {
       id: socket.id,
@@ -87,7 +131,7 @@ io.on('connection', (socket) => {
     // Notify all other participants
     socket.to(roomId).emit('participants-updated', room.participants);
 
-    console.log(`${userName} joined room: ${roomId}`);
+    console.log(`[${new Date().toISOString()}] ${userName} joined room: ${roomId}`);
   });
 
   // Vote
@@ -184,10 +228,10 @@ io.on('connection', (socket) => {
     const participant = room.participants[participantIndex];
     room.participants.splice(participantIndex, 1);
 
-    // If room is empty, delete it
+    // If room is empty, don't delete immediately. Set a timestamp.
     if (room.participants.length === 0) {
-      rooms.delete(roomId);
-      console.log(`Room deleted: ${roomId}`);
+      room.emptySince = Date.now();
+      console.log(`[${new Date().toISOString()}] Room ${roomId} is now empty. Starting 60m grace period.`);
     } else {
       // If moderator left, assign new moderator
       if (participant.isModerator && room.participants.length > 0) {
@@ -199,7 +243,7 @@ io.on('connection', (socket) => {
     }
 
     socket.leave(roomId);
-    console.log(`${participant.name} left room: ${roomId}`);
+    console.log(`[${new Date().toISOString()}] ${participant.name} left room: ${roomId}`);
   }
 });
 
