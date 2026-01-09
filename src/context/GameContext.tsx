@@ -29,6 +29,7 @@ interface GameContextType {
   joinRoom: (roomId: string, userName: string) => void;
   vote: (value: string) => void;
   revealVotes: () => void;
+  hideVotes: () => void;
   resetTable: () => void;
   leaveRoom: () => void;
 }
@@ -99,6 +100,15 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       }));
     });
 
+    // Votes hidden
+    newSocket.on('votes-hidden', () => {
+      console.log('Votes hidden');
+      setGameState(prev => ({
+        ...prev,
+        revealed: false,
+      }));
+    });
+
     // Table reset
     newSocket.on('table-reset', () => {
       console.log('Table reset');
@@ -150,6 +160,12 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
+  const hideVotes = () => {
+    if (socket && gameState.roomId) {
+      socket.emit('hide-votes', { roomId: gameState.roomId });
+    }
+  };
+
   const resetTable = () => {
     if (socket && gameState.roomId) {
       socket.emit('reset-table', { roomId: gameState.roomId });
@@ -180,6 +196,7 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         joinRoom,
         vote,
         revealVotes,
+        hideVotes,
         resetTable,
         leaveRoom,
       }}

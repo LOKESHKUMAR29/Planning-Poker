@@ -13,6 +13,7 @@ const GameView: React.FC = () => {
     connected,
     vote,
     revealVotes,
+    hideVotes,
     resetTable,
     leaveRoom,
   } = useGame();
@@ -31,7 +32,7 @@ const GameView: React.FC = () => {
   const hasVotes = gameState.participants.some(p => p.hasVoted);
 
   return (
-    <div className="h-screen flex flex-col p-2 md:p-4 overflow-hidden">
+    <div className="min-h-screen flex flex-col p-2 md:p-4">
       {/* Header */}
       <div className="max-w-7xl w-full mx-auto mb-2">
         <div className="glass-effect rounded-xl p-2 md:px-4 md:py-2">
@@ -85,9 +86,9 @@ const GameView: React.FC = () => {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl w-full mx-auto flex-1 grid grid-cols-1 lg:grid-cols-4 gap-4 overflow-hidden">
+      <div className="max-w-7xl w-full mx-auto flex-1 grid grid-cols-1 lg:grid-cols-4 gap-4">
         {/* Participants Sidebar */}
-        <div className="lg:col-span-1 order-2 lg:order-1 h-fit">
+        <div className="lg:col-span-1 order-2 lg:order-1">
           <ParticipantList
             participants={gameState.participants}
             currentUserId={currentUser?.id}
@@ -95,7 +96,7 @@ const GameView: React.FC = () => {
         </div>
 
         {/* Game Area */}
-        <div className="lg:col-span-3 order-1 lg:order-2 flex flex-col gap-2 overflow-y-auto pr-2 custom-scrollbar">
+        <div className="lg:col-span-3 order-1 lg:order-2 flex flex-col gap-2">
           <Table
             participants={gameState.participants}
             currentUserId={currentUser?.id}
@@ -108,6 +109,7 @@ const GameView: React.FC = () => {
           {isModerator && (
             <ModeratorControls
               onReveal={revealVotes}
+              onHide={hideVotes}
               onReset={resetTable}
               revealed={gameState.revealed}
               hasVotes={hasVotes}

@@ -32,13 +32,13 @@ const ParticipantList: React.FC<ParticipantListProps> = ({ participants, current
   };
 
   return (
-    <div className="glass-effect rounded-xl p-3">
+    <div className="glass-effect rounded-xl p-3 h-full flex flex-col">
       <div className="flex items-center gap-2 mb-3">
         <Users className="w-5 h-5 text-primary-400" />
         <h2 className="text-lg font-bold">Participants ({participants.length})</h2>
       </div>
 
-      <div className="space-y-1.5 max-h-[200px] overflow-y-auto pr-1 custom-scrollbar">
+      <div className="space-y-1.5 flex-1 p-0.5">
         {participants.map((participant, index) => (
           <motion.div
             key={participant.id}

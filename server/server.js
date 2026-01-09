@@ -176,6 +176,37 @@ io.on('connection', (socket) => {
     console.log(`Votes revealed in room: ${roomId}`);
   });
 
+  // Hide votes
+  socket.on('hide-votes', ({ roomId }) => {
+    console.log(`[hide-votes] Request from ${socket.id} for room ${roomId}`);
+    const room = rooms.get(roomId);
+
+    if (!room) {
+      console.warn(`[hide-votes] Room not found: ${roomId}`);
+      socket.emit('error', { message: 'Room not found' });
+      return;
+    }
+
+    const participant = room.participants.find(p => p.id === socket.id);
+    if (!participant) {
+      console.warn(`[hide-votes] User ${socket.id} not in participants of room ${roomId}`);
+      // Fallback: check if they are socket.data.userId
+      socket.emit('error', { message: 'You are not in this room' });
+      return;
+    }
+
+    if (!participant.isModerator) {
+      console.warn(`[hide-votes] User ${participant.name} (${socket.id}) is not a moderator`);
+      socket.emit('error', { message: 'Only moderators can hide votes' });
+      return;
+    }
+
+    room.revealed = false;
+    io.to(roomId).emit('votes-hidden');
+
+    console.log(`[hide-votes] Votes hidden in room: ${roomId} by ${participant.name}`);
+  });
+
   // Reset table
   socket.on('reset-table', ({ roomId }) => {
     const room = rooms.get(roomId);

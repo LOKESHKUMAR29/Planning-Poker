@@ -1,5 +1,5 @@
 import React from 'react';
-import { Eye, RotateCcw } from 'lucide-react';
+import { Eye, EyeOff, RotateCcw } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface ModeratorControlsProps {
@@ -7,11 +7,13 @@ interface ModeratorControlsProps {
   onReset: () => void;
   revealed: boolean;
   hasVotes: boolean;
+  onHide: () => void;
 }
 
 const ModeratorControls: React.FC<ModeratorControlsProps> = ({
   onReveal,
   onReset,
+  onHide,
   revealed,
   hasVotes,
 }) => {
@@ -22,14 +24,26 @@ const ModeratorControls: React.FC<ModeratorControlsProps> = ({
       className="flex gap-2 justify-center"
     >
       <button
-        onClick={onReveal}
-        disabled={revealed || !hasVotes}
+        onClick={() => {
+          console.log(`[ModeratorControls] Clicked ${revealed ? 'Hide' : 'Reveal'}`);
+          revealed ? onHide() : onReveal();
+        }}
+        disabled={!hasVotes}
         className={`bg-primary-500 hover:bg-primary-600 px-4 py-1.5 rounded-lg text-white text-sm font-bold flex items-center gap-2 transition-all ${
-          revealed || !hasVotes ? 'opacity-50 cursor-not-allowed' : ''
+          !hasVotes ? 'opacity-50 cursor-not-allowed' : ''
         }`}
       >
-        <Eye className="w-4 h-4" />
-        Reveal
+        {revealed ? (
+          <>
+            <EyeOff className="w-4 h-4" />
+            Hide
+          </>
+        ) : (
+          <>
+            <Eye className="w-4 h-4" />
+            Reveal
+          </>
+        )}
       </button>
 
       <button

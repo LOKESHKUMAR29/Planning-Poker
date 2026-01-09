@@ -7,6 +7,7 @@ interface PokerCardProps {
   isSelected?: boolean;
   onClick?: () => void;
   size?: 'small' | 'medium' | 'large';
+  initials?: string;
 }
 
 const PokerCard: React.FC<PokerCardProps> = ({
@@ -15,6 +16,7 @@ const PokerCard: React.FC<PokerCardProps> = ({
   isSelected = false,
   onClick,
   size = 'medium',
+  initials = 'PP',
 }) => {
   const sizeClasses = {
     small: 'w-16 h-24 text-xl',
@@ -49,7 +51,7 @@ const PokerCard: React.FC<PokerCardProps> = ({
             transform: 'rotateY(0deg)',
           }}
         >
-          <div className="text-white/30 text-4xl font-bold">PP</div>
+          <div className="text-white/30 text-2xl font-black tracking-tight">{initials}</div>
         </div>
 
         {/* Card Front */}
